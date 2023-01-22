@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go-project-create/templates"
-	"go-project-create/utils"
+	"github.com/Psarmmiey/go-project-creator/templates"
+	"github.com/Psarmmiey/go-project-creator/utils"
 
 	"github.com/BurntSushi/toml"
 	"github.com/urfave/cli"

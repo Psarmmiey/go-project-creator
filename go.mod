@@ -1,4 +1,4 @@
-module go-project-create
+module github.com/Psarmmiey/go-project-creator
 
 go 1.19
 
