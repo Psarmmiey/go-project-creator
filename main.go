@@ -63,8 +63,14 @@ func main() {
 			fmt.Println("Config file is required")
 			return errors.New("config file is required")
 		}
-		createEntireStructure(configFile)
-		runCommands(configFile)
+
+		var config tomlConfig
+		if _, err := toml.DecodeFile(configFile, &config); err != nil {
+			fmt.Println(err)
+			return err
+		}
+		createEntireStructure(config)
+		runCommands(config)
 		return nil
 	}
 
@@ -74,12 +80,7 @@ func main() {
 	}
 }
 
-func createEntireStructure(configFile string) {
-	var config tomlConfig
-	if _, err := toml.DecodeFile(configFile, &config); err != nil {
-		fmt.Println(err)
-		return
-	}
+func createEntireStructure(config tomlConfig) {
 	// create the internal folder
 	err := os.MkdirAll("internal", os.ModePerm)
 	if err != nil {
@@ -336,13 +337,7 @@ import (
 	templates.CreateMainGoFile(config.Project.Module)
 }
 
-func runCommands(configFile string) {
-
-	var config tomlConfig
-	if _, err := toml.DecodeFile(configFile, &config); err != nil {
-		fmt.Println(err)
-		return
-	}
+func runCommands(config tomlConfig) {
 
 	// go mod init
 	fmt.Println("Initializing go module...")
