@@ -1,17 +1,8 @@
 [project]
 name = "example_project"
 module = "github.com/username/example_project"
+description = "This is a description of the project"
 
-
-[api-reference]
-version = "v1"
-description = "This is a description of the API"
-title = "API Reference"
-basePath = "/api/v1"
-schemas = [
-    "http",
-    "https"
-]
 
 [folders]
 internal = [

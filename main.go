@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/Psarmmiey/go-project-creator/templates"
 	"github.com/Psarmmiey/go-project-creator/utils"
@@ -18,8 +19,9 @@ import (
 
 type tomlConfig struct {
 	Project struct {
-		Name   string
-		Module string
+		Name        string
+		Module      string
+		Description string
 	}
 	Folders struct {
 		Internal []string
@@ -225,6 +227,8 @@ Proprietary and confidential.
 import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"{{.Project.Module}}/internal/components/products/services"
+
 )`
 						_, err = file.WriteString(fmt.Sprintf("%s\n", copyright))
 						if err != nil {
@@ -236,19 +240,25 @@ import (
 							fmt.Println(err)
 							return
 						}
-						_, err = file.WriteString(fmt.Sprintf("%s\n\n", imports))
+
+						t, err := template.New("imports").Parse(imports)
+						if err != nil {
+							fmt.Println(err)
+							return
+						}
+						err = t.Execute(file, config)
 						if err != nil {
 							fmt.Println(err)
 							return
 						}
 
 						// Create Init Function with router and db as parameters and add routes
-						_, err = file.WriteString(fmt.Sprintln("func Init(router *gin.Engine, db *gorm.DB){\n"))
+						_, err = file.Write([]byte("\n\nfunc Init(router *gin.Engine, db *gorm.DB){\n"))
 						if err != nil {
 							fmt.Println(err)
 							return
 						}
-						_, err = file.WriteString(fmt.Sprintf("\t//TODO: Add Routes\n}\n"))
+						_, err = file.Write([]byte("\t//TODO: Add Routes\n"))
 						if err != nil {
 							fmt.Println(err)
 							return
@@ -334,7 +344,7 @@ import (
 		templates.CreateEnvFile()
 	}
 
-	templates.CreateMainGoFile(config.Project.Module)
+	templates.CreateMainGoFile(config.Project.Name, config.Project.Description, config.Project.Module)
 }
 
 func runCommands(config tomlConfig) {

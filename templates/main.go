@@ -18,9 +18,9 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 
-	"{{.ProjectName}}/internal/db"
-	"{{.ProjectName}}/internal/components/middleware"
-	_ "{{.ProjectName}}/docs"
+	"{{.ProjectModule}}/internal/db"
+	"{{.ProjectModule}}/internal/components/middleware"
+	_ "{{.ProjectModule}}/docs"
 	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -29,12 +29,11 @@ import (
 
 
 
-// @title Interstellar Horizon Plus API Documentation
-// @description This is the API documentation for the Interstellar Horizon Plus API.
+// @title {{.ProjectName}} API Reference
+// @description {{.ProjectDesc}}.
 // @version 1.0.0
 // @BasePath /
 // @schemes http https
-
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
@@ -89,13 +88,12 @@ func main() {
 	var router *gin.Engine = gin.Default()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// Todo: add other routes
-	//utils.DecodeTxEnvelope()
 	router.Run()
 
 }
 `
 
-func CreateMainGoFile(projectName string) {
+func CreateMainGoFile(projectName, projectDesc, projectModule string) {
 	// Create the file
 	file, err := os.Create("main.go")
 	if err != nil {
@@ -105,7 +103,7 @@ func CreateMainGoFile(projectName string) {
 
 	// Write the file
 	t := template.Must(template.New("main").Parse(main))
-	err = t.Execute(file, struct{ ProjectName string }{projectName})
+	err = t.Execute(file, struct{ ProjectName, ProjectDesc, ProjectModule string }{projectName, projectDesc, projectModule})
 	if err != nil {
 		fmt.Println(err)
 	}
