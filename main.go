@@ -136,25 +136,25 @@ func createEntireStructure(config tomlConfig) {
 						return
 					}
 					if subfolder == "models" {
-						for _, model := range config.Models[k] {
-							file, err := os.OpenFile(filepath.Join("internal", folder, k, subfolder, "main.go"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+						file, err := os.OpenFile(filepath.Join("internal", folder, k, subfolder, "main.go"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+						if err != nil {
+							fmt.Println(err)
+							return
+						}
+						defer file.Close()
+
+						// check if package name is already written
+						f, _ := os.Open(filepath.Join("internal", folder, k, subfolder, "main.go"))
+						defer f.Close()
+						packageCheck, _ := io.ReadAll(f)
+						if !strings.Contains(string(packageCheck), "package "+subfolder) {
+							_, err = file.WriteString(fmt.Sprintf("package %s\n\n", subfolder))
 							if err != nil {
 								fmt.Println(err)
 								return
 							}
-							defer file.Close()
-
-							// check if package name is already written
-							f, _ := os.Open(filepath.Join("internal", folder, k, subfolder, "main.go"))
-							defer f.Close()
-							packageCheck, _ := io.ReadAll(f)
-							if !strings.Contains(string(packageCheck), "package "+subfolder) {
-								_, err = file.WriteString(fmt.Sprintf("package %s\n\n", subfolder))
-								if err != nil {
-									fmt.Println(err)
-									return
-								}
-							}
+						}
+						for _, model := range config.Models[k] {
 
 							_, err = file.WriteString(fmt.Sprintf("type %s struct{\n", model.Name))
 							if err != nil {
@@ -373,7 +373,7 @@ func runCommands(config tomlConfig) {
 
 	// go get
 	fmt.Println("Getting dependencies...")
-	cmd = exec.Command("go", "get", "-u", "github.com/gin-gonic/gin")
+	cmd = exec.Command("go", "get")
 	cmd.Dir = "./"
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
