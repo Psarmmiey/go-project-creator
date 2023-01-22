@@ -88,10 +88,7 @@ func main() {
 
 	var router *gin.Engine = gin.Default()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	router.Use(middleware.CORSMiddleware())
-	accounts_controller.Init(router, horizonDatabase)
-	payments_controller.Init(router, horizonDatabase)
-	transactions_controller.Init(router, horizonDatabase)
+	// Todo: add other routes
 	//utils.DecodeTxEnvelope()
 	router.Run()
 
