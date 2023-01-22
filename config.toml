@@ -3,6 +3,16 @@ name = "example_project"
 module = "github.com/username/example_project"
 description = "This is a description of the project"
 
+[options]
+db = true
+errors = true
+middleware = true
+githubWorkflows = true
+docker = true
+makefile = true
+env = true
+gitignore = true
+
 
 [folders]
 internal = [
@@ -23,22 +33,24 @@ users = [
     "models",
     "services"
 ]
+ledger = [
+    "controllers",
+    "models",
+    "services"
+]
+payments = [
+    "controllers",
+    "models",
+    "services"
+]
 
 
 [models]
-users = [    { name = "User", fields = ["Id", "username", "email", "password"], crud = true},
+users = [    { name = "User", fields = ["Id", "username", "email", "password"], crud = false},
     { name = "Profile", fields = ["Id", "userId", "firstName", "lastName"], crud = true}
 ]
 products = [    { name = "Product", fields = ["Id", "name", "price", "quantity"], crud = true},
     { name = "Review", fields = ["Id", "productId", "username", "rating", "text"], crud = true}
 ]
 
-[options]
-db = true
-errors = true
-middleware = true
-githubWorkflows = true
-docker = true
-makefile = true
-env = true
-gitignore = true
+

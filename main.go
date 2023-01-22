@@ -258,7 +258,7 @@ import (
 							fmt.Println(err)
 							return
 						}
-						_, err = file.Write([]byte("\t//TODO: Add Routes\n"))
+						_, err = file.Write([]byte("\t//TODO: Add Routes\n}\n"))
 						if err != nil {
 							fmt.Println(err)
 							return
