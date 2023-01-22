@@ -64,7 +64,7 @@ func main() {
 			return errors.New("config file is required")
 		}
 		createEntireStructure(configFile)
-		runCommands()
+		runCommands(configFile)
 		return nil
 	}
 
@@ -333,13 +333,13 @@ import (
 		templates.CreateEnvFile()
 	}
 
-	//templates.CreateMainGoFile(config.Project.Module)
+	templates.CreateMainGoFile(config.Project.Module)
 }
 
-func runCommands() {
+func runCommands(configFile string) {
 
 	var config tomlConfig
-	if _, err := toml.DecodeFile("config.toml", &config); err != nil {
+	if _, err := toml.DecodeFile(configFile, &config); err != nil {
 		fmt.Println(err)
 		return
 	}
