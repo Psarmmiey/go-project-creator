@@ -87,6 +87,7 @@ func main() {
 
 	var router *gin.Engine = gin.Default()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.Use(middleware.CORSMiddleware())
 	// Todo: add other routes
 	router.Run()
 

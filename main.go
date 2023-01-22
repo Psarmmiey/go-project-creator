@@ -393,6 +393,17 @@ func runCommands(config tomlConfig) {
 		fmt.Println(err)
 	}
 
+	// go fmt
+	fmt.Println("Formatting code...")
+	cmd = exec.Command("go", "fmt")
+	cmd.Dir = "./"
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	// swagger init
 	fmt.Println("Initializing swagger...")
 	cmd = exec.Command("swag", "init")
@@ -403,5 +414,8 @@ func runCommands(config tomlConfig) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	// output
+	fmt.Println("Done!")
 
 }
