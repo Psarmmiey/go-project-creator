@@ -1,0 +1,53 @@
+[project]
+name = "example_project"
+module = "github.com/username/example_project"
+
+
+[api-reference]
+version = "v1"
+description = "This is a description of the API"
+title = "API Reference"
+basePath = "/api/v1"
+schemas = [
+    "http",
+    "https"
+]
+
+[folders]
+internal = [
+   "components",
+    "db",
+    "errors",
+    "utils",
+]
+
+[components]
+products = [
+    "controllers",
+    "models",
+    "services"
+]
+users = [
+    "controllers",
+    "models",
+    "services"
+]
+
+
+[models]
+users = [    { name = "User", fields = ["Id", "username", "email", "password"], crud = true},
+    { name = "Profile", fields = ["Id", "userId", "firstName", "lastName"], crud = true}
+]
+products = [    { name = "Product", fields = ["Id", "name", "price", "quantity"], crud = true},
+    { name = "Review", fields = ["Id", "productId", "username", "rating", "text"], crud = true}
+]
+
+[options]
+db = true
+errors = true
+middleware = true
+githubWorkflows = true
+docker = true
+makefile = true
+env = true
+gitignore = true
