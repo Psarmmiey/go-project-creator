@@ -1,6 +1,6 @@
 [project]
 name = "example_project"
-module = "github.com/username/example_project"
+module = "interstellar/example_project"
 description = "This is a description of the project"
 
 [options]
