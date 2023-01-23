@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -54,25 +53,32 @@ func main() {
 		cli.StringFlag{
 			Name:     "config, c",
 			Usage:    "Path to load the config file",
-			Required: true,
+			Required: false,
+		},
+		cli.StringFlag{
+			Name:  "component, comp",
+			Usage: "Create a new component",
 		},
 	}
 
 	app.Action = func(c *cli.Context) error {
 		fmt.Println("Creating project structure...")
 		configFile := c.String("config")
-		if configFile == "" {
-			fmt.Println("Config file is required")
-			return errors.New("config file is required")
+		if configFile != "" {
+
+			var config tomlConfig
+			if _, err := toml.DecodeFile(configFile, &config); err != nil {
+				fmt.Println(err)
+				return err
+			}
+			createEntireStructure(config)
+			runCommands(config)
 		}
 
-		var config tomlConfig
-		if _, err := toml.DecodeFile(configFile, &config); err != nil {
-			fmt.Println(err)
-			return err
+		if c.String("component") != "" {
+			// create the component
+			createComponent(c.String("component"))
 		}
-		createEntireStructure(config)
-		runCommands(config)
 		return nil
 	}
 
@@ -417,5 +423,129 @@ func runCommands(config tomlConfig) {
 
 	// output
 	fmt.Println("Done!")
+
+}
+
+func createComponent(componentName string) {
+	// check if internal folder exists
+	if _, err := os.Stat("internal"); os.IsNotExist(err) {
+		// create internal folder
+		err = os.Mkdir("internal", os.ModePerm)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	// check if components folder exists
+	if _, err := os.Stat("internal/components"); os.IsNotExist(err) {
+		// create components folder
+		err = os.Mkdir("internal/components", os.ModePerm)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	// create component directory
+	err := os.Mkdir("internal/components/"+componentName, os.ModePerm)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// create model directory
+	err = os.Mkdir("internal/components/"+componentName+"/model", os.ModePerm)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// create service directory
+	err = os.Mkdir("internal/components/"+componentName+"/service", os.ModePerm)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// create controller directory
+	err = os.Mkdir("internal/components/"+componentName+"/controller", os.ModePerm)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// create model file
+	file, err := os.Create("internal/components/" + componentName + "/model/" + "main.go")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	var modelFile = `
+	package model
+
+	import "time"
+
+	type ` + componentName + ` struct {
+		` + utils.ToTitle(componentName) + `ID string ` + "`json:\"" + componentName + "ID\"`" + `
+		CreatedAt time.Time ` + "`json:\"createdAt\"`" + `
+		UpdatedAt time.Time ` + "`json:\"updatedAt\"`" + `
+	}
+	`
+
+	// write to model file
+	_, err = file.WriteString(modelFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// create service file
+	file, err = os.Create("internal/components/" + componentName + "/service/" + "main.go")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	// write to service file
+	_, err = file.WriteString("package service \r \r")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// create controller file
+	file, err = os.Create("internal/components/" + componentName + "/controller/" + "main.go")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	// create response
+	var routeSample = `
+	package controller
+
+	import (
+		"net/http"
+
+		"github.com/gin-gonic/gin"
+		"github.com/jinzhu/gorm"
+	)
+
+
+	func Init(router *gin.Engine, db *gorm.DB) {
+		group := router.Group("/{{.componentName}}") 
+		group.GET("/", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"message": "Hello World!"})
+		})
+	}
+	`
+	tmpl, err := template.New("main").Parse(routeSample)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = tmpl.Execute(file, map[string]string{"componentName": componentName})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// write to controller file
 
 }
