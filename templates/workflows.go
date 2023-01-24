@@ -73,6 +73,43 @@ jobs:
           package-name: release-please-action
 `
 
+var docValidationYml = `
+name: Go doc checker
+
+on:
+  push:
+    branches:
+      - api-reference
+      - main
+      - dev
+  pull_request:
+    branches:
+      - api-reference
+      - main
+      - dev
+
+jobs:
+  check-comments:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.19.x'
+    - name: Check Doc
+      run: |
+        go run github.com/Psarmmiey/check-comment@latest --path=$GITHUB_WORKSPACE
+        if [ $? -eq 0 ]; then
+          echo "All functions passed the comment check."
+        else
+          echo "Some functions failed the comment check."
+          exit 1
+        fi
+`
+
 func CreateDockerImageYml() string {
 	return dockerImageYml
 }
@@ -96,18 +133,18 @@ func CreateGithubWorkflow() {
 	// Create the .github/workflows/release-please.yml file
 	_, err = os.Create(".github/workflows/release-please.yml")
 	if err != nil {
-		fmt.Println(err, "error")
+		fmt.Println(err)
 	}
 
 	// Open the .github/workflows/release-please.yml file for writing
 	f, err := os.OpenFile(".github/workflows/release-please.yml", os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err != nil {
-		fmt.Println("error", err)
+
 		fmt.Println(err)
 	}
 
 	// Write the code to the file
-	_, err = f.WriteString(CreateReleasePleaseYml())
+	_, err = f.WriteString(releasePleaseYml)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -128,7 +165,28 @@ func CreateGithubWorkflow() {
 	}
 
 	// Write the code to the file
-	_, err = f.WriteString(CreateDockerImageYml())
+	_, err = f.WriteString(dockerImageYml)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Close the file
+	f.Close()
+
+	// Create the .github/workflows/doc-validation.yml file
+	_, err = os.Create(".github/workflows/doc-validation.yml")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Open the .github/workflows/doc-validation.yml file for writing
+	f, err = os.OpenFile(".github/workflows/doc-validation.yml", os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Write the code to the file
+	_, err = f.WriteString(docValidationYml)
 	if err != nil {
 		fmt.Println(err)
 	}
