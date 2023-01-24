@@ -366,6 +366,17 @@ func runCommands(config tomlConfig) {
 		fmt.Println(err)
 	}
 
+	// swagger init
+	fmt.Println("Initializing swagger...")
+	cmd = exec.Command("swag", "init")
+	cmd.Dir = "./"
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	// git init
 	fmt.Println("Initializing git...")
 	cmd = exec.Command("git", "init")
@@ -402,17 +413,6 @@ func runCommands(config tomlConfig) {
 	// go fmt
 	fmt.Println("Formatting code...")
 	cmd = exec.Command("go", "fmt")
-	cmd.Dir = "./"
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err = cmd.Run()
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// swagger init
-	fmt.Println("Initializing swagger...")
-	cmd = exec.Command("swag", "init")
 	cmd.Dir = "./"
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
