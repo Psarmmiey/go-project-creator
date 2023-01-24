@@ -368,7 +368,7 @@ func runCommands(config tomlConfig) {
 
 	// swagger init
 	fmt.Println("Initializing swagger...")
-	cmd = exec.Command("swag", "init")
+	cmd = exec.Command("go run github.com/swaggo/swag/cmd/swag@latest", "init")
 	cmd.Dir = "./"
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
